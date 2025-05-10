@@ -250,8 +250,8 @@
 				<tr>
 					<td colspan=4>
 						<span
-							style="font-size: 32px; font-family: 'Courier New', Courier, monospace; /* Adds fallbacks */">A
-							Grand Unified Theory of Deep Learning</span>
+							style="font-size: 32px; font-family: 'Courier New', Courier, monospace; /* Adds fallbacks */">
+							Contrastive Learning of Augmented Audio-Visual Data</span>
 					</td>
 				</tr>
 				<tr>
@@ -276,8 +276,11 @@
 			<div style="position:fixed; max-width:inherit; top:max(20%,120px)">
 				<b style="font-size:16px">Outline</b><br><br>
 				<a href="#intro">Introduction</a><br><br>
-				<a href="#does_x_do_y">Does X do Y?</a><br><br>
-				<a href="#implications_and_limitations">Implications and limitations</a><br><br>
+				<a href="#background">Background</a><br><br>
+				<a href="#methods">Methods</a><br><br>
+				<a href="#analysis">Analysis</a><br><br>
+				<a href="#conclusion">Conclusion</a><br><br>
+				<a href="#citations">References</a><br><br>
 			</div>
 		</div>
 		<div class="main-content-block">
@@ -294,49 +297,129 @@
 		</div>
 		<div class="main-content-block">
 			<h1>Introduction</h1>
-			Motivate your project. What question are you asking. Why is it unanswered so far? What gap in the literature
-			or practice are you filling?
-			Why is it important?
+			In recent years, contrastive learning has emerged as a powerful, self-supervised technique to learn
+			meaningful representations, usually by encouraging invariance to some sort of data augmentation.
+			At the same time, multimodal learning has shown promise for getting a more robust understanding of complex
+			data.
+			By integrating information from varying modalities, models are able to combine different information to
+			achieve better performance on downstream tasks.
+			We propose leveraging a combination of these two in order to learn more robust representations to improve
+			video and sound classification.
 		</div>
 		<div class="margin-right-block">
 			Margin note that clarifies some detail #main-content-block for intro section.
 		</div>
 	</div>
 
-	<div class="content-margin-container" id="does_x_do_y">
+	<div class="content-margin-container" id="background">
 		<div class="margin-left-block">
 		</div>
 		<div class="main-content-block">
-			<h1>Does X do Y?</h1>
-			It is well known that Y does Y. And this has raised the question does X do Y? Because if Y does Y then it
-			stands to reason that X does Y.
-			But we cannot answer this until we realize the Z implies Y and X can be linked to Z.<br><br>
+			<h1>Background</h1>
+			Contrastive learning is a representation learning technique focused on generating similar encodings for data
+			that represent similar concepts.
+			To accomplish this, it utilizes the notion of positive and negative samples to optimize a "constrastive loss
+			function" that rewards similar representations for similar data and penalizes similar representations of
+			different data.
+			A specific paper focusing on contrastive loss between augmented images <a
+				href="#ChenContrastiveLearning">[1]</a> uses the following contrastive loss function,
 
-			Now let's write some math!<br>
-			<center>
-				<math xmlns="http://www.w3.org/1998/Math/MathML">
-					<mrow>
+			<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+				<mrow>
+					<msub>
+						<mi>l</mi>
 						<mrow>
-							<mo>&#x2202;</mo>
-							<mi>y</mi>
+							<mi>i</mi>
+							<mo>,</mo>
+							<mi>j</mi>
 						</mrow>
-						<mo>/</mo>
-						<mrow>
-							<mo>&#x2202;</mo>
-							<mi>x</mi>
-						</mrow>
-					</mrow>
+					</msub>
 					<mo>=</mo>
-					<mi>x</mi>
-				</math>
-			</center>
+					<mo>&#x2212;</mo>
+					<mfrac>
+						<mrow>
+							<mi>exp</mi>
+							<mo>(</mo>
+							<mi>sim</mi>
+							<mo>(</mo>
+							<msub>
+								<mi mathvariant="bold">z</mi>
+								<mi>i</mi>
+							</msub>
+							<mo>,</mo>
+							<msub>
+								<mi mathvariant="bold">z</mi>
+								<mi>j</mi>
+							</msub>
+							<mo>)</mo>
+							<mo>/</mo>
+							<mi>&tau;</mi>
+							<mo>)</mo>
+						</mrow>
+						<mrow>
+							<munderover>
+								<mo>∑</mo>
+								<mrow>
+									<mi>k</mi>
+									<mo>=</mo>
+									<mn>1</mn>
+								</mrow>
+								<mrow>
+									<mn>2</mn>
+									<mi>N</mi>
+								</mrow>
+							</munderover>
+							<msub>
+								<mi mathvariant="double-struck">1</mi>
+								<mrow>
+									<mo>[</mo>
+									<mi>k</mi>
+									<mo>&ne;</mo>
+									<mi>i</mi>
+									<mo>]</mo>
+								</mrow>
+							</msub>
+							<mi>exp</mi>
+							<mo>(</mo>
+							<mi>sim</mi>
+							<mo>(</mo>
+							<msub>
+								<mi mathvariant="bold">z</mi>
+								<mi>i</mi>
+							</msub>
+							<mo>,</mo>
+							<msub>
+								<mi mathvariant="bold">z</mi>
+								<mi>j</mi>
+							</msub>
+							<mo>)</mo>
+							<mo>/</mo>
+							<mi>&tau;</mi>
+							<mo>),</mo>
+						</mrow>
+					</mfrac>
+				</mrow>
+			</math>
 			<br>
-			It's probably best to ask an LLM to help do the web
-			formatting for math. You can tell it "convert this latex equation into MathML: $$\frac{\partial dy}{\partial
-			dx} = x$$"
-			But it took me a few tries. So, if you get frustrated, you can embed an image of the equation, or use other
-			packages for
-			rendering equations on webpages.
+			where where z_i and z_j are embeddings of samples i and j, sim(z_i, z_j) calculates the cosine similarity of the embeddings, tau is a temperature hyperparameter, and l_(i, j) is the loss between samples i and j.
+			<br>
+			<br>
+			Contrastive learning itself has seen usage with a variety of modalities.
+			Frameworks like SimCLR augment images, extract representations from the augmented data, and apply a
+			contrastive loss function to create image representations that are a significant improvement over previous
+			self-supervised, semi-supervised, and transfer learning methods <a href="#ChenContrastiveLearning">[1]</a>.
+			<br>
+			<br>
+			Though not directly contrastive learning, the audio modality has also seen augmentations such as shifting
+			pitch, time stretching, noise, and volume adjustment <a href="#AudioAugmentation">[2]</a>.
+			An example of the pitch shifting augmentation is demonstrated in Figure 1.
+			Cross-modality contrastive learning has also been done, where Ma et al. propose an actively sampled
+			dictionary approach to a cross-modal, audio/visual extension of the traditional contrastive learning method
+			<a href="#AudioVisualConstrastiveLearning">[3]</a>.
+			However, because Ma et al. focus on an actively sampled dictionary, they don't deal with data augmentation
+			in their paper.
+			This is what we plan to explore in ours - augmentations of audio and visual data and the effect they can
+			have on learning effective representations.			
 		</div>
 		<div class="margin-right-block" style="transform: translate(0%, -100%);">
 			<!-- you can move the margin notes up and down with translate -->
@@ -344,11 +427,11 @@
 		</div>
 	</div>
 
-	<div class="content-margin-container">
+	<div class="content-margin-container" id="methods">
 		<div class="margin-left-block">
 		</div>
 		<div class="main-content-block">
-			<h1>Another section</h1>
+			<h1>Methods</h1>
 			In this section we embed a video:
 			<video class='my-video' loop autoplay muted style="width: 725px">
 				<source src="./images/mtsh.mp4" type="video/mp4">
@@ -359,11 +442,22 @@
 		</div>
 	</div>
 
-	<div class="content-margin-container" id="implications_and_limitations">
+	<div class="content-margin-container" id="analysis">
 		<div class="margin-left-block">
 		</div>
 		<div class="main-content-block">
-			<h1>Implications and limitations</h1>
+			<h1>Analysis</h1>
+			Let's end with some discussion of the implications and limitations.
+		</div>
+		<div class="margin-right-block">
+		</div>
+	</div>
+
+	<div class="content-margin-container" id="conclusion">
+		<div class="margin-left-block">
+		</div>
+		<div class="main-content-block">
+			<h1>Conclusion</h1>
 			Let's end with some discussion of the implications and limitations.
 		</div>
 		<div class="margin-right-block">
@@ -376,9 +470,18 @@
 		<div class="main-content-block">
 			<div class='citation' id="references" style="height:auto"><br>
 				<span style="font-size:16px">References:</span><br><br>
-				<a id="ref_1"></a>[1] <a href="https://en.wikipedia.org/wiki/Allegory_of_the_cave">Allegory of the
-					Cave</a>, Plato, c. 375 BC<br><br>
-				<a id="ref_2"></a>[2] <a href="">A Human-Level AGI</a>, OpenAI, 2025<br><br>
+				<a id="ChenContrastiveLearning"></a>[1] <a href="https://arxiv.org/abs/2002.05709">A Simple Framework
+					for Contrastive Learning of Visual Representations</a>, Ting Chen and Simon Kornblith and Mohammad
+				Norouzi and Geoffrey Hinton, 2020<br><br>
+				<a id="AudioAugmentation"></a>[2] <a
+					href="https://sba.org.br/open_journal_systems/index.php/cba/article/view/3469">A Survey of Data
+					Augmentation for Audio Classification</a>, Ferreira-Paiva, Lucas and Alfaro Espinoza, Elizabeth and
+				Martins Almeida, Vinicius and Felix, Leonardo and Neves, Rodolpho, 2022<br><br>
+				<a id="AudioVisualConstrastiveLearning"></a>[3] <a href="https://arxiv.org/abs/2009.09805">Active
+					Contrastive Learning of Audio-Visual Video Representations</a>, Shuang Ma and Zhaoyang Zeng and
+				Daniel McDuff and Yale Song, 2021<br><br>
+				<a id="MusicDataset"></a>[4] <a href="https://github.com/roudimit/MUSIC_dataset/">MUSIC Dataset from
+					Sound of Pixels</a>, Andrew Rouditchenko and Hang Zhao, 2020<br><br>
 			</div>
 		</div>
 		<div class="margin-right-block">
