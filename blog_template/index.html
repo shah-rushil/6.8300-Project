@@ -1,0 +1,561 @@
+<html>
+
+<head>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+	<link rel="shortcut icon" href="images/icon.ico">
+	<style type="text/css">
+		body {
+			background-color: #f5f9ff;
+		}
+
+		/* Hide both math displays initially, will display based on JS detection */
+		.mathjax-mobile,
+		.mathml-non-mobile {
+			display: none;
+		}
+
+		/* Show the MathML content by default on non-mobile devices */
+		.show-mathml .mathml-non-mobile {
+			display: block;
+		}
+
+		.show-mathjax .mathjax-mobile {
+			display: block;
+		}
+
+		.content-margin-container {
+			display: flex;
+			width: 100%;
+			/* Ensure the container is full width */
+			justify-content: left;
+			/* Horizontally centers the children in the container */
+			align-items: center;
+			/* Vertically centers the children in the container */
+		}
+
+		.main-content-block {
+			width: 70%;
+			/* Change this percentage as needed */
+			max-width: 1100px;
+			/* Optional: Maximum width */
+			background-color: #fff;
+			border-left: 1px solid #DDD;
+			border-right: 1px solid #DDD;
+			padding: 8px 8px 8px 8px;
+			font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+		}
+
+		.margin-left-block {
+			font-size: 14px;
+			width: 15%;
+			/* Change this percentage as needed */
+			max-width: 130px;
+			/* Optional: Maximum width */
+			position: relative;
+			margin-left: 10px;
+			text-align: left;
+			font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+			padding: 5px;
+		}
+
+		.margin-right-block {
+			font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+			font-size: 14px;
+			width: 25%;
+			/* Change this percentage as needed */
+			max-width: 256px;
+			/* Optional: Maximum width */
+			position: relative;
+			text-align: left;
+			padding: 10px;
+			/* Optional: Adds padding inside the caption */
+		}
+
+		img {
+			max-width: 100%;
+			/* Make sure it fits inside the container */
+			height: auto;
+			display: block;
+			margin: auto;
+		}
+
+		.my-video {
+			max-width: 100%;
+			/* Make sure it fits inside the container */
+			height: auto;
+			display: block;
+			margin: auto;
+		}
+
+		/* Hide both video displays initially, will display based on JS detection */
+		.vid-mobile,
+		.vid-non-mobile {
+			display: none;
+		}
+
+		/* Show the video content by default on non-mobile devices */
+		.show-vid-mobile .vid-mobile {
+			display: block;
+		}
+
+		.show-vid-non-mobile .vid-non-mobile {
+			display: block;
+		}
+
+		a:link,
+		a:visited {
+			color: #0e7862;
+			/*#1367a7;*/
+			text-decoration: none;
+		}
+
+		a:hover {
+			color: #24b597;
+			/*#208799;*/
+		}
+
+		h1 {
+			font-size: 18px;
+			margin-top: 4px;
+			margin-bottom: 10px;
+		}
+
+		h2 {
+			font-size: 16px;
+			margin-top: 4px;
+			margin-bottom: 10px;
+		}
+
+		table.header {
+			font-weight: 300;
+			font-size: 17px;
+			flex-grow: 1;
+			width: 70%;
+			max-width: calc(100% - 290px);
+			/* Adjust according to the width of .paper-code-tab */
+		}
+
+		table td,
+		table td * {
+			vertical-align: middle;
+			position: relative;
+		}
+
+		table.paper-code-tab {
+			flex-shrink: 0;
+			margin-left: 8px;
+			margin-top: 8px;
+			padding: 0px 0px 0px 8px;
+			width: 290px;
+			height: 150px;
+		}
+
+		.layered-paper {
+			/* modified from: http://css-tricks.com/snippets/css/layered-paper/ */
+			box-shadow:
+				0px 0px 1px 1px rgba(0, 0, 0, 0.35),
+				/* The top layer shadow */
+				5px 5px 0 0px #fff,
+				/* The second layer */
+				5px 5px 1px 1px rgba(0, 0, 0, 0.35),
+				/* The second layer shadow */
+				10px 10px 0 0px #fff,
+				/* The third layer */
+				10px 10px 1px 1px rgba(0, 0, 0, 0.35);
+			/* The third layer shadow */
+			margin-top: 5px;
+			margin-left: 10px;
+			margin-right: 30px;
+			margin-bottom: 5px;
+		}
+
+		hr {
+			height: 1px;
+			/* Sets the height of the line to 1 pixel */
+			border: none;
+			/* Removes the default border */
+			background-color: #DDD;
+			/* Sets the line color to black */
+		}
+
+		div.hypothesis {
+			width: 80%;
+			background-color: #EEE;
+			border: 1px solid black;
+			border-radius: 10px;
+			-moz-border-radius: 10px;
+			-webkit-border-radius: 10px;
+			font-family: Courier;
+			font-size: 18px;
+			text-align: center;
+			margin: auto;
+			padding: 16px 16px 16px 16px;
+		}
+
+		div.citation {
+			font-size: 0.8em;
+			background-color: #fff;
+			padding: 10px;
+			height: 200px;
+		}
+
+		.fade-in-inline {
+			position: absolute;
+			text-align: center;
+			margin: auto;
+			-webkit-mask-image: linear-gradient(to right,
+					transparent 0%,
+					transparent 40%,
+					black 50%,
+					black 90%,
+					transparent 100%);
+			mask-image: linear-gradient(to right,
+					transparent 0%,
+					transparent 40%,
+					black 50%,
+					black 90%,
+					transparent 100%);
+			-webkit-mask-size: 8000% 100%;
+			mask-size: 8000% 100%;
+			animation-name: sweepMask;
+			animation-duration: 4s;
+			animation-iteration-count: infinite;
+			animation-timing-function: linear;
+			animation-delay: -1s;
+		}
+
+		.fade-in2-inline {
+			animation-delay: 1s;
+		}
+
+		.inline-div {
+			position: relative;
+			display: inline-block;
+			/* Makes both the div and paragraph inline-block elements */
+			vertical-align: top;
+			/* Aligns them at the top, you can adjust this to middle, bottom, etc., based on your needs */
+			width: 50px;
+			/* Optional: Adds space between the div and the paragraph */
+		}
+	</style>
+
+	<title>Contrastive Learning of Augmented Audio-Visual Data</title>
+	<meta property="og:title" content="Contrastive Learning of Augmented Audio-Visual Data" />
+	<meta charset="UTF-8">
+</head>
+
+<body>
+
+	<div class="content-margin-container">
+		<div class="margin-left-block">
+		</div>
+		<div class="main-content-block">
+			<table class="header" align=left>
+				<tr>
+					<td colspan=4>
+						<span
+							style="font-size: 32px; font-family: 'Courier New', Courier, monospace; /* Adds fallbacks */">
+							Contrastive Learning of Augmented Audio-Visual Data</span>
+					</td>
+				</tr>
+				<tr>
+					<td align=left>
+						<span style="font-size:17px"><a href="https://shah-rushil.github.io">Rushil Shah</a></span>
+					</td>
+					<td align=left>
+						<span style="font-size:17px"><a href="your_partner's_website">Alex He</a></span>
+					</td>
+				<tr>
+					<td colspan=4 align=left><span style="font-size:18px">Final project for 6.8300, MIT</span></td>
+				</tr>
+			</table>
+		</div>
+		<div class="margin-right-block">
+		</div>
+	</div>
+
+	<div class="content-margin-container" id="intro">
+		<div class="margin-left-block">
+			<!-- table of contents here -->
+			<div style="position:fixed; max-width:inherit; top:max(20%,120px)">
+				<b style="font-size:16px">Outline</b><br><br>
+				<a href="#intro">Introduction</a><br><br>
+				<a href="#background">Background</a><br><br>
+				<a href="#methods">Methods</a><br><br>
+				<a href="#analysis">Analysis</a><br><br>
+				<a href="#conclusion">Conclusion</a><br><br>
+				<a href="#citations">References</a><br><br>
+			</div>
+		</div>
+		<div class="main-content-block">
+			<!--You can embed an image like this:-->
+			<img src="./images/your_image_here.png" width=512px />
+		</div>
+		<div class="margin-right-block">
+			Caption for the image.
+		</div>
+	</div>
+
+	<div class="content-margin-container" id="intro">
+		<div class="margin-left-block">
+		</div>
+		<div class="main-content-block">
+			<h1>Introduction</h1>
+			In recent years, contrastive learning has emerged as a powerful, self-supervised technique to learn
+			meaningful representations, usually by encouraging invariance to some sort of data augmentation.
+			At the same time, multimodal learning has shown promise for getting a more robust understanding of complex
+			data.
+			By integrating information from varying modalities, models are able to combine different information to
+			achieve better performance on downstream tasks.
+			We propose leveraging a combination of these two in order to learn more robust representations to improve
+			video and sound classification.
+		</div>
+		<div class="margin-right-block">
+			Margin note that clarifies some detail #main-content-block for intro section.
+		</div>
+	</div>
+
+	<div class="content-margin-container" id="background">
+		<div class="margin-left-block">
+		</div>
+		<div class="main-content-block">
+			<h1>Background</h1>
+			Contrastive learning is a representation learning technique focused on generating similar encodings for data
+			that represent similar concepts.
+			To accomplish this, it utilizes the notion of positive and negative samples to optimize a "constrastive loss
+			function" that rewards similar representations for similar data and penalizes similar representations of
+			different data.
+			A specific paper focusing on contrastive loss between augmented images <a
+				href="#ChenContrastiveLearning">[1]</a> uses the following contrastive loss function,
+
+			<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+				<mrow>
+					<msub>
+						<mi>l</mi>
+						<mrow>
+							<mi>i</mi>
+							<mo>,</mo>
+							<mi>j</mi>
+						</mrow>
+					</msub>
+					<mo>=</mo>
+					<mo>&#x2212;</mo>
+					<mfrac>
+						<mrow>
+							<mi>exp</mi>
+							<mo>(</mo>
+							<mi>sim</mi>
+							<mo>(</mo>
+							<msub>
+								<mi mathvariant="bold">z</mi>
+								<mi>i</mi>
+							</msub>
+							<mo>,</mo>
+							<msub>
+								<mi mathvariant="bold">z</mi>
+								<mi>j</mi>
+							</msub>
+							<mo>)</mo>
+							<mo>/</mo>
+							<mi>&tau;</mi>
+							<mo>)</mo>
+						</mrow>
+						<mrow>
+							<munderover>
+								<mo>∑</mo>
+								<mrow>
+									<mi>k</mi>
+									<mo>=</mo>
+									<mn>1</mn>
+								</mrow>
+								<mrow>
+									<mn>2</mn>
+									<mi>N</mi>
+								</mrow>
+							</munderover>
+							<msub>
+								<mi mathvariant="double-struck">1</mi>
+								<mrow>
+									<mo>[</mo>
+									<mi>k</mi>
+									<mo>&ne;</mo>
+									<mi>i</mi>
+									<mo>]</mo>
+								</mrow>
+							</msub>
+							<mi>exp</mi>
+							<mo>(</mo>
+							<mi>sim</mi>
+							<mo>(</mo>
+							<msub>
+								<mi mathvariant="bold">z</mi>
+								<mi>i</mi>
+							</msub>
+							<mo>,</mo>
+							<msub>
+								<mi mathvariant="bold">z</mi>
+								<mi>j</mi>
+							</msub>
+							<mo>)</mo>
+							<mo>/</mo>
+							<mi>&tau;</mi>
+							<mo>),</mo>
+						</mrow>
+					</mfrac>
+				</mrow>
+			</math>
+			<br>
+			where where z_i and z_j are embeddings of samples i and j, sim(z_i, z_j) calculates the cosine similarity of
+			the embeddings, tau is a temperature hyperparameter, and l_(i, j) is the loss between samples i and j.
+			<br>
+			<br>
+			Contrastive learning itself has seen usage with a variety of modalities.
+			Frameworks like SimCLR augment images, extract representations from the augmented data, and apply a
+			contrastive loss function to create image representations that are a significant improvement over previous
+			self-supervised, semi-supervised, and transfer learning methods <a href="#ChenContrastiveLearning">[1]</a>.
+			<br>
+			<br>
+			Though not directly contrastive learning, the audio modality has also seen augmentations such as shifting
+			pitch, time stretching, noise, and volume adjustment <a href="#AudioAugmentation">[2]</a>.
+			An example of the pitch shifting augmentation is demonstrated in Figure 1.
+			Cross-modality contrastive learning has also been done, where Ma et al. propose an actively sampled
+			dictionary approach to a cross-modal, audio/visual extension of the traditional contrastive learning method
+			<a href="#AudioVisualConstrastiveLearning">[3]</a>.
+			However, because Ma et al. focus on an actively sampled dictionary, they don't deal with data augmentation
+			in their paper.
+			This is what we plan to explore in ours - augmentations of audio and visual data and the effect they can
+			have on learning effective representations.
+		</div>
+		<div class="margin-right-block" style="transform: translate(0%, -100%);">
+			<!-- you can move the margin notes up and down with translate -->
+			Interestingly, Plato also asked if X does Y, in <a href="#ref_1">[1]</a>.
+		</div>
+	</div>
+
+	<div class="content-margin-container" id="methods">
+		<div class="margin-left-block">
+		</div>
+		<div class="main-content-block">
+			<h1>Methods</h1>
+			Formally, we want to understand if augmenting audio and visual data help models learn more robust representations for better performance on
+			downstream tasks like instrument classification?
+			<br>
+			<br>
+			<h2>Dataset</h2>
+			To accomplish this we gather data from the Music dataset from sounds of pixels <a href="#MusicDataset">[4]</a>.
+			The data consists of around 50 videos between 1 to 3 minutes long from 21 unique instrument classes.
+			To simplify the dataset, we crop the middle 5 seconds of every video, reducing the size of the data and providing consistency
+			across all videos. The middle is also chosen as to reduce any empty noise and select moments of playing with the most action.
+			We also make sure to extract the audio from the video in wav format to prevent any data loss. All of these operations are performed using
+			the moviepy and openCV python packages.
+			<br>
+			<br>
+			Using this clipped data, we can now perform augmentations to the video and audio. 
+			We will apply the same augmentation to each frame of a particular video for consistency. The videos will be augmented using two compositions of augmentations: crop + color
+			and crop + sobel, as these were shown to be effective for image augmentation in contrastive learning, see <a href="#ChenContrastiveLearning">[1]</a>. 
+			The crop and color augmentations were performed using a random number to determine the amount to modify each parameter.
+			However, for the crop size, we limit the range from 0.5 to 1 to prevent really small cropping of images to make it impossible to identify which instrument
+			is being played. 
+			<br>
+			<br>
+			Similarly, we will also apply an audio augmentation. Using common
+			transformation techniques listed in the paper by Ferreira-Paiva et al. <a href="#AudioAugmentation">[2]</a>, we will use
+			background noise to allow our representation to work for noisy data as well as volume adjustment to account
+			for the distance our camera is to the source. Specifically, for the background noise, we overlay
+			a quiet clapping noise in order to emulate live audience interaction with a performance. 
+			For the volume adjustment, we use DRC, dynamic range compression, a technique that amplifies quiet sounds and softens louder sounds
+			to generate a more even noise pattern.
+			<br>
+			<br>	
+			Some common audio transformations we chose not to include were
+			shifting pitch since pitch is correlated with the instrument type and time altering augmentation since the
+			frames should correspond directly to the output noise.
+			<br>
+			<br>
+			<h2>Encoder Models</h2>
+			\noindent Our experiment has a lot of uncertainty in terms of the relationship between the audio and visual
+			data. This is because of an intentional assumption that the transformations which performed well for audio
+			and visual data separately will generate suitable representations for the combined audio-visual space. There
+			is a possibility that augmentations will violate inherent relationships between the audio and video data,
+			effectively "cancelling out" beneficial effects of using multimodal data. \\
+
+			\noindent Get a small clip of a video and parse the frames and audio from it. Let the clip of the video
+			contain N frames and 1 audio portion.  \\
+
+			\noindent Our model is as follows. For each clip of the videos, we will generate positive samples from
+			augmenting the video and audio samples as described above and we treat the other augmented samples as
+			negative examples, which will allow us to perform contrastive learning. Next, pass the data into pre-trained
+			video and audio encoders (3D-ResNet18 and wav2vec). We chose the ResNet18 model because that is what Ma et
+			al. used\cite{AudioVisualConstrastiveLearning} and we chose wav2vec, a general purpose audio encoder since
+			we couldn't find any audio encoders for music data. Next, use a projection head to take the video and audio
+			input and map them into a shared space. This will be a linear layer with weights that will be trained
+			through the model. Finally, we will use the following objective function to make it so that audio and visual
+			inputs from the same time block have similar embeddings,
+			$$l_{i, j} = -\text{log}\frac{\exp(\text{sim}(\textbf{z}_i,
+			\textbf{z}_j)/\tau)}{\sum_{k=1}^{2N}\mathbb{1}_{[k\neq i]}
+			\exp(\text{sim}(\textbf{z}_i,\textbf{z}_j)/\tau)},$$
+			where $\text{z}_i$ and $\text{z}_j$ are embeddings of samples $i$ and $j$, $\text{sim}(\textbf{z}_i,
+			\textbf{z}_j)$ calculates the cosine similarity of the embeddings, $\tau$ is a temperature hyperparameter,
+			and $l_{i, j}$ is the loss between samples $i$ and $j$ \cite{ChenConstrastiveLearning}. With this model, we
+			will run a fine tuning loop using a music dataset \cite{MusicDataset} containing labeled videos (with audio)
+			of instruments being played.
+		</div>
+		<div class="margin-right-block">
+			A caption for the video could go here.
+		</div>
+	</div>
+
+	<div class="content-margin-container" id="analysis">
+		<div class="margin-left-block">
+		</div>
+		<div class="main-content-block">
+			<h1>Analysis</h1>
+			Let's end with some discussion of the implications and limitations.
+		</div>
+		<div class="margin-right-block">
+		</div>
+	</div>
+
+	<div class="content-margin-container" id="conclusion">
+		<div class="margin-left-block">
+		</div>
+		<div class="main-content-block">
+			<h1>Conclusion</h1>
+			Let's end with some discussion of the implications and limitations.
+
+			For the complete code and model used for this paper, please visit our <a href="https://github.com/shah-rushil/6.8300-Project">GitHub</a>.
+		</div>
+		<div class="margin-right-block">
+		</div>
+	</div>
+
+	<div class="content-margin-container" id="citations">
+		<div class="margin-left-block">
+		</div>
+		<div class="main-content-block">
+			<div class='citation' id="references" style="height:auto"><br>
+				<span style="font-size:16px">References:</span><br><br>
+				<a id="ChenContrastiveLearning"></a>[1] <a href="https://arxiv.org/abs/2002.05709">A Simple Framework
+					for Contrastive Learning of Visual Representations</a>, Ting Chen and Simon Kornblith and Mohammad
+				Norouzi and Geoffrey Hinton, 2020<br><br>
+				<a id="AudioAugmentation"></a>[2] <a
+					href="https://sba.org.br/open_journal_systems/index.php/cba/article/view/3469">A Survey of Data
+					Augmentation for Audio Classification</a>, Ferreira-Paiva, Lucas and Alfaro Espinoza, Elizabeth and
+				Martins Almeida, Vinicius and Felix, Leonardo and Neves, Rodolpho, 2022<br><br>
+				<a id="AudioVisualConstrastiveLearning"></a>[3] <a href="https://arxiv.org/abs/2009.09805">Active
+					Contrastive Learning of Audio-Visual Video Representations</a>, Shuang Ma and Zhaoyang Zeng and
+				Daniel McDuff and Yale Song, 2021<br><br>
+				<a id="MusicDataset"></a>[4] <a href="https://github.com/roudimit/MUSIC_dataset/">MUSIC Dataset from
+					Sound of Pixels</a>, Andrew Rouditchenko and Hang Zhao, 2020<br><br>
+			</div>
+		</div>
+		<div class="margin-right-block">
+			<!-- margin notes for reference block here -->
+		</div>
+	</div>
+
+</body>
+
+</html>
