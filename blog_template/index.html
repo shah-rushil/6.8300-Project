@@ -122,6 +122,12 @@
 			margin-bottom: 10px;
 		}
 
+		h2 {
+			font-size: 16px;
+			margin-top: 4px;
+			margin-bottom: 10px;
+		}
+
 		table.header {
 			font-weight: 300;
 			font-size: 17px;
@@ -401,7 +407,8 @@
 				</mrow>
 			</math>
 			<br>
-			where where z_i and z_j are embeddings of samples i and j, sim(z_i, z_j) calculates the cosine similarity of the embeddings, tau is a temperature hyperparameter, and l_(i, j) is the loss between samples i and j.
+			where where z_i and z_j are embeddings of samples i and j, sim(z_i, z_j) calculates the cosine similarity of
+			the embeddings, tau is a temperature hyperparameter, and l_(i, j) is the loss between samples i and j.
 			<br>
 			<br>
 			Contrastive learning itself has seen usage with a variety of modalities.
@@ -419,7 +426,7 @@
 			However, because Ma et al. focus on an actively sampled dictionary, they don't deal with data augmentation
 			in their paper.
 			This is what we plan to explore in ours - augmentations of audio and visual data and the effect they can
-			have on learning effective representations.			
+			have on learning effective representations.
 		</div>
 		<div class="margin-right-block" style="transform: translate(0%, -100%);">
 			<!-- you can move the margin notes up and down with translate -->
@@ -432,10 +439,68 @@
 		</div>
 		<div class="main-content-block">
 			<h1>Methods</h1>
-			In this section we embed a video:
-			<video class='my-video' loop autoplay muted style="width: 725px">
-				<source src="./images/mtsh.mp4" type="video/mp4">
-			</video>
+			Formally, we want to understand if augmenting audio and visual data help models learn more robust representations for better performance on
+			downstream tasks like instrument classification?
+			<br>
+			<br>
+			<h2>Dataset</h2>
+			To accomplish this we gather data from the Music dataset from sounds of pixels <a href="#MusicDataset">[4]</a>.
+			The data consists of around 50 videos between 1 to 3 minutes long from 21 unique instrument classes.
+			To simplify the dataset, we crop the middle 5 seconds of every video, reducing the size of the data and providing consistency
+			across all videos. The middle is also chosen as to reduce any empty noise and select moments of playing with the most action.
+			We also make sure to extract the audio from the video in wav format to prevent any data loss. All of these operations are performed using
+			the moviepy and openCV python packages.
+			<br>
+			<br>
+			Using this clipped data, we can now perform augmentations to the video and audio. 
+			We will apply the same augmentation to each frame of a particular video for consistency. The videos will be augmented using two compositions of augmentations: crop + color
+			and crop + sobel, as these were shown to be effective for image augmentation in contrastive learning, see <a href="#ChenContrastiveLearning">[1]</a>. 
+			The crop and color augmentations were performed using a random number to determine the amount to modify each parameter.
+			However, for the crop size, we limit the range from 0.5 to 1 to prevent really small cropping of images to make it impossible to identify which instrument
+			is being played. 
+			<br>
+			<br>
+			Similarly, we will also apply an audio augmentation. Using common
+			transformation techniques listed in the paper by Ferreira-Paiva et al. <a href="#AudioAugmentation">[2]</a>, we will use
+			background noise to allow our representation to work for noisy data as well as volume adjustment to account
+			for the distance our camera is to the source. Specifically, for the background noise, we overlay
+			a quiet clapping noise in order to emulate live audience interaction with a performance. 
+			For the volume adjustment, we use DRC, dynamic range compression, a technique that amplifies quiet sounds and softens louder sounds
+			to generate a more even noise pattern.
+			<br>
+			<br>	
+			Some common audio transformations we chose not to include were
+			shifting pitch since pitch is correlated with the instrument type and time altering augmentation since the
+			frames should correspond directly to the output noise.
+			<br>
+			<br>
+			<h2>Encoder Models</h2>
+			\noindent Our experiment has a lot of uncertainty in terms of the relationship between the audio and visual
+			data. This is because of an intentional assumption that the transformations which performed well for audio
+			and visual data separately will generate suitable representations for the combined audio-visual space. There
+			is a possibility that augmentations will violate inherent relationships between the audio and video data,
+			effectively "cancelling out" beneficial effects of using multimodal data. \\
+
+			\noindent Get a small clip of a video and parse the frames and audio from it. Let the clip of the video
+			contain N frames and 1 audio portion.  \\
+
+			\noindent Our model is as follows. For each clip of the videos, we will generate positive samples from
+			augmenting the video and audio samples as described above and we treat the other augmented samples as
+			negative examples, which will allow us to perform contrastive learning. Next, pass the data into pre-trained
+			video and audio encoders (3D-ResNet18 and wav2vec). We chose the ResNet18 model because that is what Ma et
+			al. used\cite{AudioVisualConstrastiveLearning} and we chose wav2vec, a general purpose audio encoder since
+			we couldn't find any audio encoders for music data. Next, use a projection head to take the video and audio
+			input and map them into a shared space. This will be a linear layer with weights that will be trained
+			through the model. Finally, we will use the following objective function to make it so that audio and visual
+			inputs from the same time block have similar embeddings,
+			$$l_{i, j} = -\text{log}\frac{\exp(\text{sim}(\textbf{z}_i,
+			\textbf{z}_j)/\tau)}{\sum_{k=1}^{2N}\mathbb{1}_{[k\neq i]}
+			\exp(\text{sim}(\textbf{z}_i,\textbf{z}_j)/\tau)},$$
+			where $\text{z}_i$ and $\text{z}_j$ are embeddings of samples $i$ and $j$, $\text{sim}(\textbf{z}_i,
+			\textbf{z}_j)$ calculates the cosine similarity of the embeddings, $\tau$ is a temperature hyperparameter,
+			and $l_{i, j}$ is the loss between samples $i$ and $j$ \cite{ChenConstrastiveLearning}. With this model, we
+			will run a fine tuning loop using a music dataset \cite{MusicDataset} containing labeled videos (with audio)
+			of instruments being played.
 		</div>
 		<div class="margin-right-block">
 			A caption for the video could go here.
@@ -459,6 +524,8 @@
 		<div class="main-content-block">
 			<h1>Conclusion</h1>
 			Let's end with some discussion of the implications and limitations.
+
+			For the complete code and model used for this paper, please visit our <a href="https://github.com/shah-rushil/6.8300-Project">GitHub</a>.
 		</div>
 		<div class="margin-right-block">
 		</div>
