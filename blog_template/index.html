@@ -117,13 +117,13 @@
 		}
 
 		h1 {
-			font-size: 18px;
+			font-size: 24px;
 			margin-top: 4px;
 			margin-bottom: 10px;
 		}
 
 		h2 {
-			font-size: 16px;
+			font-size: 18px;
 			margin-top: 4px;
 			margin-bottom: 10px;
 		}
@@ -238,6 +238,19 @@
 			/* Aligns them at the top, you can adjust this to middle, bottom, etc., based on your needs */
 			width: 50px;
 			/* Optional: Adds space between the div and the paragraph */
+		}
+
+		.column {
+			float: left;
+			width: 45%;
+			padding-left: 30px;
+		}
+
+		/* Clear floats after image containers */
+		.row::after {
+			content: "";
+			clear: both;
+			display: table;
 		}
 	</style>
 
@@ -429,8 +442,6 @@
 			have on learning effective representations.
 		</div>
 		<div class="margin-right-block" style="transform: translate(0%, -100%);">
-			<!-- you can move the margin notes up and down with translate -->
-			Interestingly, Plato also asked if X does Y, in <a href="#ref_1">[1]</a>.
 		</div>
 	</div>
 
@@ -439,36 +450,47 @@
 		</div>
 		<div class="main-content-block">
 			<h1>Methods</h1>
-			Formally, we want to understand if augmenting audio and visual data help models learn more robust representations for better performance on
+			Formally, we want to understand if augmenting audio and visual data help models learn more robust
+			representations for better performance on
 			downstream tasks like instrument classification?
 			<br>
 			<br>
 			<h2>Dataset</h2>
-			To accomplish this we gather data from the Music dataset from sounds of pixels <a href="#MusicDataset">[4]</a>.
+			To accomplish this we gather data from the Music dataset from sounds of pixels <a
+				href="#MusicDataset">[4]</a>.
 			The data consists of around 50 videos between 1 to 3 minutes long from 21 unique instrument classes.
-			To simplify the dataset, we crop the middle 5 seconds of every video, reducing the size of the data and providing consistency
-			across all videos. The middle is also chosen as to reduce any empty noise and select moments of playing with the most action.
-			We also make sure to extract the audio from the video in wav format to prevent any data loss. All of these operations are performed using
+			To simplify the dataset, we crop the middle 5 seconds of every video, reducing the size of the data and
+			providing consistency
+			across all videos. The middle is also chosen as to reduce any empty noise and select moments of playing with
+			the most action.
+			We also make sure to extract the audio from the video in wav format to prevent any data loss. All of these
+			operations are performed using
 			the moviepy and openCV python packages.
 			<br>
 			<br>
-			Using this clipped data, we can now perform augmentations to the video and audio. 
-			We will apply the same augmentation to each frame of a particular video for consistency. The videos will be augmented using two compositions of augmentations: crop + color
-			and crop + sobel, as these were shown to be effective for image augmentation in contrastive learning, see <a href="#ChenContrastiveLearning">[1]</a>. 
-			The crop and color augmentations were performed using a random number to determine the amount to modify each parameter.
-			However, for the crop size, we limit the range from 0.5 to 1 to prevent really small cropping of images to make it impossible to identify which instrument
-			is being played. 
+			Using this clipped data, we can now perform augmentations to the video and audio.
+			We will apply the same augmentation to each frame of a particular video for consistency. The videos will be
+			augmented using two compositions of augmentations: crop + color
+			and crop + sobel, as these were shown to be effective for image augmentation in contrastive learning, see <a
+				href="#ChenContrastiveLearning">[1]</a>.
+			The crop and color augmentations were performed using a random number to determine the amount to modify each
+			parameter.
+			However, for the crop size, we limit the range from 0.5 to 1 to prevent really small cropping of images to
+			make it impossible to identify which instrument
+			is being played.
 			<br>
 			<br>
 			Similarly, we will also apply an audio augmentation. Using common
-			transformation techniques listed in the paper by Ferreira-Paiva et al. <a href="#AudioAugmentation">[2]</a>, we will use
+			transformation techniques listed in the paper by Ferreira-Paiva et al. <a href="#AudioAugmentation">[2]</a>,
+			we will use
 			background noise to allow our representation to work for noisy data as well as volume adjustment to account
 			for the distance our camera is to the source. Specifically, for the background noise, we overlay
-			a quiet clapping noise in order to emulate live audience interaction with a performance. 
-			For the volume adjustment, we use DRC, dynamic range compression, a technique that amplifies quiet sounds and softens louder sounds
+			a quiet clapping noise in order to emulate live audience interaction with a performance.
+			For the volume adjustment, we use DRC, dynamic range compression, a technique that amplifies quiet sounds
+			and softens louder sounds
 			to generate a more even noise pattern.
 			<br>
-			<br>	
+			<br>
 			Some common audio transformations we chose not to include were
 			shifting pitch since pitch is correlated with the instrument type and time altering augmentation since the
 			frames should correspond directly to the output noise.
@@ -479,99 +501,150 @@
 			where audio and visual data from similar instruments are mapped to the same state. To accomplish this,
 			we propose the following model structure, as illustrated in Figure 1:
 			<ol>
-				<li>Pretrained Video Encoder: 3D-ResNet18 video encoder that takes in a video and outputs a corresponding state
-					that represents certain detected features from the video. We choose this encoder since it was shown to be
+				<li>Pretrained Video Encoder: 3D-ResNet18 video encoder that takes in a video and outputs a
+					corresponding state
+					that represents certain detected features from the video. We choose this encoder since it was shown
+					to be
 					effective in <a href="#ChenContrastiveLearning">[1]</a>.
 				</li> <br>
 				<li>
-					Pretrained Audio Encoder: OpenL3 audio encoder that generates audio embeddings for the audio input <a href="#AudioEncoder1">[5]</a>, <a href="#AudioEncoder2">[6]</a>. This
-					was chosen since openL3 is trained on general audio inputs compared to more popular models like wav2vec 
+					Pretrained Audio Encoder: OpenL3 audio encoder that generates audio embeddings for the audio input
+					<a href="#AudioEncoder1">[5]</a>, <a href="#AudioEncoder2">[6]</a>. This
+					was chosen since openL3 is trained on general audio inputs compared to more popular models like
+					wav2vec
 					which is trained on speech specifically.
 				</li> <br>
 				<li>
-					Projection Head: A small network attached after both encoders to take their output and construct a shared latent space for the audio-visual input.
-					We choose to make the network with three linear layers with an input and hidden dimension of 512 and output dimension of 128.
-					Between each pair of linear layers, there is a batch normalization, a ReLU layer, and a dropout layer with a dropout rate of 0.1.
-					This structure is chosen as to increase complexity in the network structure while preventing overfitting.
+					Projection Head: A small network attached after both encoders to take their output and construct a
+					shared latent space for the audio-visual input.
+					We choose to make the network with three linear layers with an input and hidden dimension of 512 and
+					output dimension of 128.
+					Between each pair of linear layers, there is a batch normalization, a ReLU layer, and a dropout
+					layer with a dropout rate of 0.1.
+					This structure is chosen as to increase complexity in the network structure while preventing
+					overfitting.
 				</li> <br>
 				<li>
-					Loss Function: A slight modification of the Chen constrastive loss function in order to generate similar embeddings for all audio/visual pairs for the same instrument
+					Loss Function: A slight modification of the Chen constrastive loss function in order to generate
+					similar embeddings for all audio/visual pairs for the same instrument
 					instead of a single video like the original loss function,
 					<br>
 					<br>
 					<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
 						<mrow>
-						  <msub>
-							<mi>l</mi>
-							<mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow>
-						  </msub>
-						  <mo>=</mo>
-						  <mo>−</mo>
-						  <mfrac>
-							<!-- numerator -->
-							<mrow>
-							  <mi>exp</mi><mo>(</mo>
-								<mi>sim</mi><mo>(</mo>
-								  <msub><mi mathvariant="bold">z</mi><mi>i</mi></msub>
-								  <mo>,</mo>
-								  <msub><mi mathvariant="bold">z</mi><mi>j</mi></msub>
-								<mo>)</mo>
-								<mo>/</mo><mi>τ</mi>
-							  <mo>)</mo>
-							</mrow>
-							<!-- denominator -->
-							<mrow>
-							  <munderover>
-								<mo>∑</mo>
-								<mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow>
-								<mrow><mn>2</mn><mi>N</mi></mrow>
-							  </munderover>
-							  <!-- indicator is 1 when A(i) ≠ A(k) -->
-							  <msub>
-								<mi mathvariant="double-struck">1</mi>
+							<msub>
+								<mi>l</mi>
 								<mrow>
-								  <mo>[</mo>
-									<mi>A</mi><mo>(</mo><mi>i</mi><mo>)</mo>
-									<mo>≠</mo>
-									<mi>A</mi><mo>(</mo><mi>k</mi><mo>)</mo>
-								  <mo>]</mo>
+									<mi>i</mi>
+									<mo>,</mo>
+									<mi>j</mi>
 								</mrow>
-							  </msub>
-							  <mi>exp</mi><mo>(</mo>
-								<mi>sim</mi><mo>(</mo>
-								  <msub><mi mathvariant="bold">z</mi><mi>i</mi></msub>
-								  <mo>,</mo>
-								  <msub><mi mathvariant="bold">z</mi><mi>k</mi></msub>
-								<mo>)</mo>
-								<mo>/</mo><mi>τ</mi>
-							  <mo>)</mo>
-							</mrow>
-						  </mfrac>
+							</msub>
+							<mo>=</mo>
+							<mo>−</mo>
+							<mfrac>
+								<!-- numerator -->
+								<mrow>
+									<mi>exp</mi>
+									<mo>(</mo>
+									<mi>sim</mi>
+									<mo>(</mo>
+									<msub>
+										<mi mathvariant="bold">z</mi>
+										<mi>i</mi>
+									</msub>
+									<mo>,</mo>
+									<msub>
+										<mi mathvariant="bold">z</mi>
+										<mi>j</mi>
+									</msub>
+									<mo>)</mo>
+									<mo>/</mo>
+									<mi>τ</mi>
+									<mo>)</mo>
+								</mrow>
+								<!-- denominator -->
+								<mrow>
+									<munderover>
+										<mo>∑</mo>
+										<mrow>
+											<mi>k</mi>
+											<mo>=</mo>
+											<mn>1</mn>
+										</mrow>
+										<mrow>
+											<mn>2</mn>
+											<mi>N</mi>
+										</mrow>
+									</munderover>
+									<!-- indicator is 1 when A(i) ≠ A(k) -->
+									<msub>
+										<mi mathvariant="double-struck">1</mi>
+										<mrow>
+											<mo>[</mo>
+											<mi>A</mi>
+											<mo>(</mo>
+											<mi>i</mi>
+											<mo>)</mo>
+											<mo>≠</mo>
+											<mi>A</mi>
+											<mo>(</mo>
+											<mi>k</mi>
+											<mo>)</mo>
+											<mo>]</mo>
+										</mrow>
+									</msub>
+									<mi>exp</mi>
+									<mo>(</mo>
+									<mi>sim</mi>
+									<mo>(</mo>
+									<msub>
+										<mi mathvariant="bold">z</mi>
+										<mi>i</mi>
+									</msub>
+									<mo>,</mo>
+									<msub>
+										<mi mathvariant="bold">z</mi>
+										<mi>k</mi>
+									</msub>
+									<mo>)</mo>
+									<mo>/</mo>
+									<mi>τ</mi>
+									<mo>)</mo>
+								</mrow>
+							</mfrac>
 						</mrow>
-					  </math>
-					  <br>
-					  Specifically, we change the indicator function in the denominator where A(i) is the instrument label for input i. 
-					  This change makes it so that we only calculate the sum of the similarities across different instruments instead of
-					  all different videos.
+					</math>
+					<br>
+					Specifically, we change the indicator function in the denominator where A(i) is the instrument label
+					for input i.
+					This change makes it so that we only calculate the sum of the similarities across different
+					instruments instead of
+					all different videos.
 				</li>
 			</ol>
-			We then perform a training loop with an Adam Optimizer with a learning rate of 0.0001 to train the projection heads. There is no need to finetune the encoders since they already detect
-			the features of the input successfully, so we freeze the weights of the encoder models before performing the training.
+			We then perform a training loop with an Adam Optimizer with a learning rate of 0.0001 to train the
+			projection heads. There is no need to finetune the encoders since they already detect
+			the features of the input successfully, so we freeze the weights of the encoder models before performing the
+			training.
 
 			<br>
 			<br>
 			<h2>Classification Model</h2>
 
-			To quantify the effectiveness of the learned encodings, we train a simple linear layer with categorical cross entropy that classifies the instrument being played
-			using the state generated by the contrastive model. The idea is that an encoding that effectively contains the variations across the instruments and minimizes variation within instruments
-			will generate a higher accuracy output with a simple network. The linear layer will efficiently determine the simple pattern stored in the encodings compared to the more complex patterns
+			To quantify the effectiveness of the learned encodings, we train a simple linear layer with categorical
+			cross entropy that classifies the instrument being played
+			using the state generated by the contrastive model. The idea is that an encoding that effectively contains
+			the variations across the instruments and minimizes variation within instruments
+			will generate a higher accuracy output with a simple network. The linear layer will efficiently determine
+			the simple pattern stored in the encodings compared to the more complex patterns
 			stored in the encodings without the learned projection heads.
 			<br>
 			<br>
 			<h2>Architecture</h2>
-			We perform the computation using an A100 GPU with CUDA. 
+			We perform the computation using an A100 GPU with CUDA.
 		</div>
-		<div class="margin-right-block">
+		<div class="margin-right-block" style="transform: translate(0%, -100%);">
 			A caption for the video could go here.
 		</div>
 	</div>
@@ -581,30 +654,78 @@
 		</div>
 		<div class="main-content-block">
 			<h1>Analysis</h1>
-			Running the training loop for the contrastive learning, we get the following tSNE plot,
-			tSNE plot ().
+			Using the dataset and the model specified in the methods, we
+			run a training loop for the contrastive learning for 40 epochs.
+			To visualize how successful the learned encodings are, we can generate a tSNE plot.
+			This procedure reduces the dimensionality of the embeddings to two dimensions while preserving the
+			relationship of the embeddings as closely as possible. This allows us to easily visualize how related
+			certain embeddings are
+			since embeddings that are closer together on the graph are more related.
 
-			<br><br>
+			<br>
 
-			This plot is interesting because it shows that some classes have better encodings than others. 
+			<img src="./images/tSNEContrastive.png" width=512px />
+
+			<br>
+
+			The tSNE plot above for contrastive learning is interesting because it shows that some classes have better
+			encodings than others.
+			Ideally, we would want there to be a small, distinct cluster for each instrument. Some instruments like the
+			erhu and electric bass
+			generate these small clusters; however, instruments like the congas and ukeleles are scattered throughout
+			the graph, implying that the
+			model was unable to generate encodings for them that facilitate classification.
+
+			<br> <br>
+
 			One reason as to why this may be the case is that certain instruments have more recognizable features that
-			are extracted from the video and audio encoder. For example ... (provide example from plot). So, 
+			are extracted from the video and audio encoder. For example, the erhu has a unique structure, allowing the
+			contrastive learning to take advantage
+			of it to generate an effective encoding. Therefore, from these encodings,
 			we would expect the classification model to perform better on certain instrument classes over others.
-			Let's see how the classification performs on the data. 
+			Let's see how the classification performs on the data.
 
 			<br><br>
 
-			To truly understand if the contrastive learning algorithm performs better, we need to compare it with taking the encoding
-			without the projection heads. This will tell us how well current encoders perform without contrastive learning on augmentations.
-			Below, we have a table summarizing the results from contrastive loss vs. regular encodings on every combination of training and validation types of
-			data (original or augmented). This combination of data is necessary to properly analyze the effectiveness of contrastive learning.
+			<div class="row">
+				<div class="column">
+					<img src="./images/contrastive_loss.png" alt="contrastive_loss" style="width:100%">
+				</div>
+				<div class="column">
+					<img src="./images/contrastive_accuracy.png" alt="contrastive_accuracy" style="width:100%">
+				</div>
+			</div>
+
+			<br><br>
+
+			As we can see from the graphs above, the model converges near 20 epochs and ends with a final classification
+			accuracy of around 80%. 
+			However, to truly understand if the contrastive learning algorithm performs better, we need to compare it with taking
+			the encoding
+			without the projection heads. This will tell us how well current encoders perform without contrastive
+			learning on augmentations.
+			Below, we have a table summarizing the results from contrastive loss vs. regular encodings on every
+			combination of training and validation types of
+			data (original or augmented). This combination of data is necessary to properly analyze the effectiveness of
+			contrastive learning.
 
 			<br><br>
 
 			TODO: Insert the table and analyze the table
 
+			<br><br>
+
+			Although the tSNE plots showed clear clustering of encodings that isn't present for the encodings produced by 
+			3D-ResNet18 and openL3, the classification model performs approximately the same after the same number of training epochs with
+			the same training and validation data. 
+
 		</div>
-		<div class="margin-right-block">
+		<div class="margin-right-block" style="transform: translate(0%, 0%);">
+			A tSNE plot visualizing the relationship between the embeddings generated by contrastive learning.
+			<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+			<br><br><br><br><br><br><br><br><br><br><br><br><br>
+			The left graph is the loss of the classification model over 20 epochs and the right graph is the accuracy
+			of a validation dataset at each epoch. We use a 70-30 split for the training/validation data.
 		</div>
 	</div>
 
@@ -613,24 +734,30 @@
 		</div>
 		<div class="main-content-block">
 			<h1>Conclusion</h1>
-			In this post, we took a look at how contrastive learning with augmentations on audio-visual data aids in generating better representations
-			for classification of real world data. We did this by generating a model that attaches a projection head to a video and audio encoders and
-			trains it with a contrastive loss. We then benchmarked the representations generated by the model with representations outputted by just the
+			In this post, we took a look at how contrastive learning with augmentations on audio-visual data aids in
+			generating better representations
+			for classification of real world data. We did this by generating a model that attaches a projection head to
+			a video and audio encoders and
+			trains it with a contrastive loss. We then benchmarked the representations generated by the model with
+			representations outputted by just the
 			encoders. This provided insight into ... (TODO: finish this once analysis is done)
 
 			<br> <br>
 
-			These encodings are powerful because not only do they provide a way to represent real world data, they do it in a compact manner, reducing the size
-			of data. The hope would be to generate an encoding procedure that is compact but also accurately contains the complexities in the data so that
+			These encodings are powerful because not only do they provide a way to represent real world data, they do it
+			in a compact manner, reducing the size
+			of data. The hope would be to generate an encoding procedure that is compact but also accurately contains
+			the complexities in the data so that
 			classification can be done through a simple linear layer with minimal training.
 
 			<br><br>
 
-			For some future directions, 
+			For some future directions,
 
 			<br><br>
 
-			For the complete code and model used for this paper, please visit our <a href="https://github.com/shah-rushil/6.8300-Project">GitHub</a>.
+			For the complete code and model used for this paper, please visit our <a
+				href="https://github.com/shah-rushil/6.8300-Project">GitHub</a>.
 		</div>
 		<div class="margin-right-block">
 		</div>
@@ -641,7 +768,7 @@
 		</div>
 		<div class="main-content-block">
 			<div class='citation' id="references" style="height:auto"><br>
-				<span style="font-size:16px">References:</span><br><br>
+				<span style="font-size:18px; font-weight: bold;">References:</span><br><br>
 				<a id="ChenContrastiveLearning"></a>[1] <a href="https://arxiv.org/abs/2002.05709">A Simple Framework
 					for Contrastive Learning of Visual Representations</a>, Ting Chen and Simon Kornblith and Mohammad
 				Norouzi and Geoffrey Hinton, 2020<br><br>
@@ -654,9 +781,13 @@
 				Daniel McDuff and Yale Song, 2021<br><br>
 				<a id="MusicDataset"></a>[4] <a href="https://github.com/roudimit/MUSIC_dataset/">MUSIC Dataset from
 					Sound of Pixels</a>, Andrew Rouditchenko and Hang Zhao, 2020<br><br>
-				<a id="AudioEncoder1"></a>[5] <a href="https://www.justinsalamon.com/uploads/4/3/9/4/4394963/cramer_looklistenlearnmore_icassp_2019.pdf">Look, Listen and Learn More: Design Choices for Deep Audio Embeddings</a>
-					Aurora Cramer, Ho-Hsiang Wu, Justin Salamon, and Juan Pablo Bello, 2019. <br><br>
-				<a id="AudioEncoder2"></a>[6] <a href="https://openaccess.thecvf.com/content_ICCV_2017/papers/Arandjelovic_Look_Listen_and_ICCV_2017_paper.pdf">Look, Listen and Learn</a>
+				<a id="AudioEncoder1"></a>[5] <a
+					href="https://www.justinsalamon.com/uploads/4/3/9/4/4394963/cramer_looklistenlearnmore_icassp_2019.pdf">Look,
+					Listen and Learn More: Design Choices for Deep Audio Embeddings</a>
+				Aurora Cramer, Ho-Hsiang Wu, Justin Salamon, and Juan Pablo Bello, 2019. <br><br>
+				<a id="AudioEncoder2"></a>[6] <a
+					href="https://openaccess.thecvf.com/content_ICCV_2017/papers/Arandjelovic_Look_Listen_and_ICCV_2017_paper.pdf">Look,
+					Listen and Learn</a>
 				Relja Arandjelović and Andrew Zisserman, 2017. <br><br>
 			</div>
 		</div>
