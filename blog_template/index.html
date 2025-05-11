@@ -520,7 +520,23 @@
 		</div>
 		<div class="main-content-block">
 			<h1>Analysis</h1>
-			Let's end with some discussion of the implications and limitations.
+			Running the training loop for the contrastive learning, we get the following tSNE plot,
+			tSNE plot ().
+
+			<br><br>
+
+			This plot is interesting because it shows that some classes have better encodings than others. So, let's
+			see how the classification performs on the data. 
+
+			<br><br>
+
+			To truly understand if the contrastive learning algorithm performs better, we need to compare it with taking the encoding
+			without the projection heads. This will tell us how good current encoders perform without contrastive learning on augmentations.
+			Below, we have a table summarizing the results from contrastive loss vs. regular encodings on every combination of training and validation types of
+			data (original or augmented). 
+
+			Get better analysis of results.
+
 		</div>
 		<div class="margin-right-block">
 		</div>
