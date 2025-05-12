@@ -511,7 +511,9 @@
 			<h2>Encoder Models and Projection Heads</h2>
 			We aim to learn a good representation of audio-visual data by generating a shared latent space
 			where audio and visual data from similar instruments are mapped to the same state. To accomplish this,
-			we propose the following model structure, as illustrated in Figure 1:
+			we propose the following model structure, as illustrated below,
+			<br> <br>
+			<img src="./images/contrastivemodel.png" width=512px />
 			<ol>
 				<li>Pretrained Video Encoder: 3D-ResNet18 video encoder that takes in a video and outputs a
 					corresponding state
@@ -656,8 +658,9 @@
 			<h2>Architecture</h2>
 			We perform the computation using an A100 GPU with CUDA.
 		</div>
-		<div class="margin-right-block" style="transform: translate(0%, -100%);">
-			A caption for the video could go here.
+		<div class="margin-right-block" style="transform: translate(0%, -60%);">
+			A diagram highlighting the constrative model structure. Identical projection head networks are
+			added to each pretrained encoder.
 		</div>
 	</div>
 
