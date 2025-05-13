@@ -523,7 +523,7 @@
 				href="#ChenContrastiveLearning">[3]</a>.
 			The crop and color augmentations were performed using a random number to determine the amount to modify each
 			parameter.
-			However, for the crop size, we limit the random range from 0.5 to 1 to prevent really small cropping of
+			However, for the crop size, we limit the random range from 0.5 to 1 fractional size of the image to prevent really small cropping of
 			images to
 			make it impossible to identify which instrument
 			is being played.
@@ -720,7 +720,7 @@
 			certain embeddings are
 			since embeddings that are closer together on the graph are more related.
 
-			<br>
+			<br><br>
 
 			<img src="./images/tSNEContrastive.png" width=512px />
 
@@ -730,7 +730,7 @@
 			instruments while others are rather scattered.
 			Ideally, we would want there to be a small, distinct cluster for each instrument. Some instruments like the
 			erhu and electric bass
-			generate these small clusters; however, instruments like the congas and ukeleles are scattered throughout
+			generate these small clusters; however, instruments like the saxophone and violin are scattered throughout
 			the graph, implying that the
 			model was unable to generate encodings for them that facilitate classification.
 
@@ -741,7 +741,7 @@
 			contrastive learning to take advantage
 			of it to generate an effective encoding. Therefore, from these encodings,
 			we would expect the classification model to perform better on certain instrument classes over others.
-			Let's see how the classification performs on the data.
+			Let's see how the classification performs by training and validating the simple network using the augmented data.
 
 			<br><br>
 
@@ -756,7 +756,7 @@
 
 			<br><br>
 
-			As we can see from the graphs above, the model converges near 20 epochs and ends with a final classification
+			As we can see from the graphs above, the model accuracy converges near 20 epochs, although the loss seems to be linearly decreasing which is interesting, and ends with a final classification
 			accuracy of around 80%.
 			However, to truly understand if the contrastive learning algorithm performs better, we need to compare it
 			with taking
