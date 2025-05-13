@@ -475,7 +475,10 @@
 			pitch, time stretching, noise, and volume adjustment <a href="#AudioAugmentation">[4]</a>.
 			An example of the pitch shifting augmentation is demonstrated below.
 			<img src="./images/AudioAugmentationExample.png" width=512px />
-			Cross-modality contrastive learning has also been done, where Ma et al. propose an actively sampled
+			Cross-modality contrastive learning has also been done.
+			CLIP, a contrastive learning model developed by OpenAI <a href="#CLIP">[6]</a>, combines the text and images to relate captions to images for
+			significant improvements to classification.
+			Similarly, Ma et al. propose an actively sampled
 			dictionary approach to a cross-modal, audio/visual extension of the traditional contrastive learning method
 			<a href="#AudioVisualConstrastiveLearning">[2]</a>.
 			However, because Ma et al. focus on an actively sampled dictionary, they don't deal with data augmentation
@@ -555,7 +558,7 @@
 				</li> <br>
 				<li>
 					Pretrained Audio Encoder: OpenL3 audio encoder that generates audio embeddings for the audio input
-					<a href="#AudioEncoder1">[6]</a>, <a href="#AudioEncoder2">[7]</a>. This
+					<a href="#AudioEncoder1">[7]</a>, <a href="#AudioEncoder2">[8]</a>. This
 					was chosen since OpenL3 is trained on general audio inputs compared to more popular models like
 					wav2vec, which is trained on speech specifically.
 				</li> <br>
@@ -570,7 +573,7 @@
 					overfitting.
 				</li> <br>
 				<li>
-					Loss Function: We use a supervised contrastive loss function <a href="#SupCon">[8]</a>.
+					Loss Function: We use a supervised contrastive loss function <a href="#SupCon">[9]</a>.
 					in order to generate similar embeddings for all audio/visual pairs for the same instrument
 					instead of a single video like the loss function from Chen et al.'s paper,
 					<br>
@@ -929,16 +932,20 @@
 					Augmentation for Audio Classification</a>, Ferreira-Paiva, Lucas and Alfaro Espinoza, Elizabeth and
 				Martins Almeida, Vinicius and Felix, Leonardo and Neves, Rodolpho, 2022<br><br>
 				<a id="MusicDataset"></a>[5] <a href="https://github.com/roudimit/MUSIC_dataset/">MUSIC Dataset from
-					Sound of Pixels</a>, Andrew Rouditchenko and Hang Zhao, 2020<br><br>
-				<a id="AudioEncoder1"></a>[6] <a
+					Sound of Pixels</a>, Andrew Rouditchenko and Hang Zhao, 2020
+					<br><br>
+				<a id="CLIP"></a>[6] <a href="https://arxiv.org/abs/2103.00020">Learning Transferable Visual Models From Natural Language Supervision
+				</a>, Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, Gretchen Krueger, and Ilya Sutskever, 2021
+					<br><br>
+				<a id="AudioEncoder1"></a>[7] <a
 					href="https://www.justinsalamon.com/uploads/4/3/9/4/4394963/cramer_looklistenlearnmore_icassp_2019.pdf">Look,
 					Listen and Learn More: Design Choices for Deep Audio Embeddings</a>
 				Aurora Cramer, Ho-Hsiang Wu, Justin Salamon, and Juan Pablo Bello, 2019. <br><br>
-				<a id="AudioEncoder2"></a>[7] <a
+				<a id="AudioEncoder2"></a>[8] <a
 					href="https://openaccess.thecvf.com/content_ICCV_2017/papers/Arandjelovic_Look_Listen_and_ICCV_2017_paper.pdf">Look,
 					Listen and Learn</a>
 				Relja Arandjelović and Andrew Zisserman, 2017. <br><br>
-				<a id="SupCon"></a>[8] <a href="https://arxiv.org/abs/2004.11362">Supervised Contrastive Learning</a>,
+				<a id="SupCon"></a>[9] <a href="https://arxiv.org/abs/2004.11362">Supervised Contrastive Learning</a>,
 				Prannay Khosla, Piotr Teterwak, Chen Wang, Aaron Sarna, Yonglong Tian, Phillip Isola,
 				Aaron Maschinot, Ce Liu, and Dilip Krishnan, 2021<br><br>
 			</div>
