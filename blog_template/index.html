@@ -345,10 +345,12 @@
 		</div>
 		<div class="main-content-block">
 			<!--You can embed an image like this:-->
-			<img src="./images/your_image_here.png" width=512px />
+			<br> <br>
+			<img src="./images/bsso-2024-robbins.webp" width=800px />
+			<br>
 		</div>
 		<div class="margin-right-block">
-			Caption for the image.
+			The Ball State University symphony orchestra
 		</div>
 	</div>
 
@@ -367,7 +369,6 @@
 			video and sound classification.
 		</div>
 		<div class="margin-right-block">
-			Margin note that clarifies some detail #main-content-block for intro section.
 		</div>
 	</div>
 
@@ -461,9 +462,9 @@
 				</mrow>
 			</math>
 			<br>
-			Where we have <i>z<sub>i</sub></i> and <i>z<sub>j</sub></i> as embeddings of samples <i>i</i> and <i>j</i>, 
-			<i>sim(z<sub>i</sub>, z<sub>j</sub>)</i> calculates the cosine similarity of the embeddings, 
-			<i>&tau;</i> is a temperature hyperparameter, and 
+			Where we have <i>z<sub>i</sub></i> and <i>z<sub>j</sub></i> as embeddings of samples <i>i</i> and <i>j</i>,
+			<i>sim(z<sub>i</sub>, z<sub>j</sub>)</i> calculates the cosine similarity of the embeddings,
+			<i>&tau;</i> is a temperature hyperparameter, and
 			<i>l<sub>(i, j)</sub></i> is the loss between samples <i>i</i> and <i>j</i>.
 			<br>
 			<br>
@@ -533,7 +534,7 @@
 			for the distance our camera is to the source. Specifically, for the background noise, we overlay
 			a quiet clapping noise in order to emulate live audience interaction with a performance.
 			For the volume adjustment, we use DRC, dynamic range compression, a technique that amplifies quiet sounds
-			and softens louder sounds to generate a more even sound pattern. These audio augmentations were performed 
+			and softens louder sounds to generate a more even sound pattern. These audio augmentations were performed
 			via the muda library in Python <a href="#MusicAugmentation">[1]</a>.
 			<br>
 			<br>
@@ -710,8 +711,9 @@
 			<h1>Results and Analysis</h1>
 			Using the dataset and the model specified in the methods, we
 			run a training loop for the contrastive learning for 40 epochs.
-			To visualize how successful the learned encodings are, we used scikit-learn to generate a tSNE plot with 
-			perplexity 30. This procedure reduces the dimensionality of the embeddings to two dimensions while preserving 
+			To visualize how successful the learned encodings are, we used scikit-learn to generate a tSNE plot with
+			perplexity 30. This procedure reduces the dimensionality of the embeddings to two dimensions while
+			preserving
 			the relationship of the embeddings as closely as possible. This allows us to easily visualize how related
 			certain embeddings are
 			since embeddings that are closer together on the graph are more related.
@@ -806,13 +808,20 @@
 
 			This aligns decently well with the tSNE plot for contrastive learning. If we take a look at which instrument
 			classes had the highest
-			accuracy of being measured for contrastive encoding and augmented training and validation, we noticed that the accordion,
-			bagpipe, drum, piano, and violin all had 100% accuracies in classification. This matches up nicely with small clusters for each
-			of those instruments present in the tSNE plot. However, the saxophone had 0% classification accuracy, which lines up with
-			the observed random scattering of saxophone points in the tSNE plot. Therefore, we can see that as expected, the instruments whose encodings
-			were clustered in the tSNE plot, have a high similarity, were able to be classified significantly more accurately compared to instruments
-			with no pattern, spread out throughout the tSNE plot. One reason for this high variance in instrument encoding is that the augmentations
-			created more significant variation for some instruments than others. We propose this hypothesis because the saxophone had a 80% classification accuracy
+			accuracy of being measured for contrastive encoding and augmented training and validation, we noticed that
+			the accordion,
+			bagpipe, drum, piano, and violin all had 100% accuracies in classification. This matches up nicely with
+			small clusters for each
+			of those instruments present in the tSNE plot. However, the saxophone had 0% classification accuracy, which
+			lines up with
+			the observed random scattering of saxophone points in the tSNE plot. Therefore, we can see that as expected,
+			the instruments whose encodings
+			were clustered in the tSNE plot, have a high similarity, were able to be classified significantly more
+			accurately compared to instruments
+			with no pattern, spread out throughout the tSNE plot. One reason for this high variance in instrument
+			encoding is that the augmentations
+			created more significant variation for some instruments than others. We propose this hypothesis because the
+			saxophone had a 80% classification accuracy
 			for the encodings produced without contrastive learning.
 
 			<br> <br>
@@ -821,7 +830,8 @@
 			trained with the full dataset
 			but validated with unaugmented data. This means that for unaugmented data, the original encoders already do
 			a good job in identifying features in the
-			audio-visual data. Therefore, performing contrastive learning isn't necessary here for testing on unaugmented data since the
+			audio-visual data. Therefore, performing contrastive learning isn't necessary here for testing on
+			unaugmented data since the
 			representations
 			generated already suffice for classification.
 
@@ -843,17 +853,23 @@
 			<h1>Conclusion</h1>
 			In this post, we took a look at how contrastive learning with augmentations on audio-visual data aids in
 			generating better representations
-			for classification of real world data. We did this by generating a model that attaches a projection head to
-			a video and audio encoders and
-			trains it with a contrastive loss. We then benchmarked the representations generated by the model with
-			representations outputted by just the
-			encoders. This provided insight into ... (TODO: finish this once analysis is done)
+			for classification of real world data. We did this by constructing a model that attached a projection head
+			to a video and audio encoder and trained with a contrastive loss. We then benchmarked the classification
+			accuracies of the representations generated by the model with representations outputted by just the
+			encoders. This provided insight into the effectiveness of contrastive loss on developing good
+			representations for classifying instruments. Specfically, we noticed that the contrastive loss makes a
+			significant improvement for augmented representations which makes sense since the model was trained with the
+			augmented data. We also saw that on the original
+			data, there was no noticeable difference in the accuracies between contrastive and regular encodings.
 
 			<br><br>
 
 			Using this analysis, we conclude that contrastive learning may be beneficial for generating representations
 			that
 			encode real world audio-visual data through particular augmentations. With better augmentations,
+			specific invariants in the audio-visual data can be captured. For example, the random cropping
+			allows the model to be invariant to the relative size of the instruments and extra audio noise allows
+			invariance to background noises (in this case it was clapping). 
 
 			<br> <br>
 
@@ -874,6 +890,13 @@
 			world applications.
 
 			<br><br>
+
+			Another area of investigation would be to apply the model structure, training, and testing procedure in this paper
+			to other datasets to see how understand how the model would work for general classification tasks. Perhaps there are some
+			datasets where contrastive learning could worsen classification accuracy. For example, for a classification task that
+			relies heavily on color may not benefit from the color augmentations presented in the paper.
+
+			<br> <br>
 
 			For the complete code and model used for this paper, please visit our <a
 				href="https://github.com/shah-rushil/6.8300-Project">GitHub</a>.
