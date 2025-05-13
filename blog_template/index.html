@@ -502,7 +502,7 @@
 			a quiet clapping noise in order to emulate live audience interaction with a performance.
 			For the volume adjustment, we use DRC, dynamic range compression, a technique that amplifies quiet sounds
 			and softens louder sounds to generate a more even sound pattern. These audio augmentations were performed 
-			via the MUDA library in Python <a href="#MusicAugmentation">[1]</a>.
+			via the muda library in Python <a href="#MusicAugmentation">[1]</a>.
 			<br>
 			<br>
 			Some common audio transformations we chose not to include were
@@ -669,9 +669,9 @@
 			<h1>Analysis</h1>
 			Using the dataset and the model specified in the methods, we
 			run a training loop for the contrastive learning for 40 epochs.
-			To visualize how successful the learned encodings are, we can generate a tSNE plot.
-			This procedure reduces the dimensionality of the embeddings to two dimensions while preserving the
-			relationship of the embeddings as closely as possible. This allows us to easily visualize how related
+			To visualize how successful the learned encodings are, we used scikit-learn to generate a tSNE plot with 
+			perplexity 30. This procedure reduces the dimensionality of the embeddings to two dimensions while preserving 
+			the relationship of the embeddings as closely as possible. This allows us to easily visualize how related
 			certain embeddings are
 			since embeddings that are closer together on the graph are more related.
 
