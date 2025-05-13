@@ -378,7 +378,9 @@
 			that represent similar concepts.
 			To accomplish this, it utilizes the notion of positive and negative samples to optimize a "constrastive loss
 			function" that rewards similar representations for similar data and penalizes similar representations of
-			different data.
+			different data. In the latent space, positive samples belonging to the same distribution as an "anchor" 
+			sample should have their distance apart minimized. Conversely, negative samples belonging to different distributions
+			should have a maximal distance from the anchor.
 			For example, in their paper focusing on contrastive loss between augmented images, Chen et al. <a
 				href="#ChenContrastiveLearning">[3]</a> uses the following contrastive loss function,
 
