@@ -588,7 +588,7 @@
 								</mrow>
 							</msub>
 							<mo>=</mo>
-							<mo>−</mo>
+							<mo>-</mo>
 							<mfrac>
 								<!-- numerator -->
 								<mrow>
@@ -806,7 +806,14 @@
 
 			This aligns decently well with the tSNE plot for contrastive learning. If we take a look at which instrument
 			classes had the highest
-			accuracy of being measured with contrastive loss, ... TODO.
+			accuracy of being measured for contrastive encoding and augmented training and validation, we notice that the accordion,
+			bagpipe, drum, piano, and violin all had 100% accuracies in classification. This matches up nicely with small clusters for each
+			of those instruments present in the tSNE plot. However, the saxophone had 0% classification accuracy, which lines up with
+			the observed random scattering of saxophone points in the tSNE plot. Therefore, we can see that as expected, the instruments whose encodings
+			were clustered in the tSNE plot, have a high similarity, were able to be classified significantly more accurately compared to instruments
+			with no pattern, spread out throughout the tSNE plot. One reason for this high variance in instrument encoding is that the augmentations
+			created significant variation for some instruments over others. We propose this hypothesis because the saxophone had a 80% classification accuracy
+			for the encodings produced without contrastive learning.
 
 			<br> <br>
 
